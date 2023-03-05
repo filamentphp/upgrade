@@ -5,7 +5,7 @@ $config = file_exists('config/filament.php') ? file_get_contents('config/filamen
 $path = $config['path'] ?? 'admin';
 
 $pathPhp = preg_match('/\'path\'\s*=>\s*(.*),/', $config, $matches) ? $matches[1] : '\'admin\'';
-$path = preg_match('/env\(\'FILAMENT_PATH\',\s*(.*)\)/', $pathPhp, $matches) ? $matches[1] : 'admin';
+$path = preg_match('/env\(\'FILAMENT_PATH\',\s*\'(.*)\'\)/', $pathPhp, $matches) ? $matches[1] : 'admin';
 
 $isAdmin = trim($path, '/') === 'admin';
 $className = $isAdmin ? 'AdminContextProvider' : 'AppContextProvider';
@@ -20,14 +20,14 @@ if ($authGuardPhp === 'env(\'FILAMENT_AUTH_GUARD\', \'web\')') {
 }
 $authGuardPhp = $authGuardPhp ? "\n            ->authGuard({$authGuardPhp})" : '';
 
-$resourcesNamespacePhp = preg_match("/'resources'\s*=>\s*\[\s*'namespace'\s*=>\s*(.*),\s*'path'\s*=>\s*(.*),/", $config, $matches) ? $matches[1] : 'app_path(\'Filament/Resources\')';
-$resourcesPathPhp = preg_match("/'resources'\s*=>\s*\[\s*'namespace'\s*=>\s*(.*),\s*'path'\s*=>\s*(.*),/", $config, $matches) ? $matches[2] : '\'App\\\\Filament\\\\Resources\'';
+$resourcesNamespacePhp = preg_match("/'resources'\s*=>\s*\[\s*'namespace'\s*=>\s*(.*),\s*'path'\s*=>\s*(.*),/", $config, $matches) ? $matches[1] : '\'App\\\\Filament\\\\Resources\'';
+$resourcesPathPhp = preg_match("/'resources'\s*=>\s*\[\s*'namespace'\s*=>\s*(.*),\s*'path'\s*=>\s*(.*),/", $config, $matches) ? $matches[2] : 'app_path(\'Filament/Resources\')';
 
-$pagesNamespacePhp = preg_match("/'pages'\s*=>\s*\[\s*'namespace'\s*=>\s*(.*),\s*'path'\s*=>\s*(.*),/", $config, $matches) ? $matches[1] : 'app_path(\'Filament/Pages\')';
-$pagesPathPhp = preg_match("/'pages'\s*=>\s*\[\s*'namespace'\s*=>\s*(.*),\s*'path'\s*=>\s*(.*),/", $config, $matches) ? $matches[2] : '\'App\\\\Filament\\\\Pages\'';
+$pagesNamespacePhp = preg_match("/'pages'\s*=>\s*\[\s*'namespace'\s*=>\s*(.*),\s*'path'\s*=>\s*(.*),/", $config, $matches) ? $matches[1] : '\'App\\\\Filament\\\\Pages\'';
+$pagesPathPhp = preg_match("/'pages'\s*=>\s*\[\s*'namespace'\s*=>\s*(.*),\s*'path'\s*=>\s*(.*),/", $config, $matches) ? $matches[2] : 'app_path(\'Filament/Pages\')';
 
-$widgetsNamespacePhp = preg_match("/'widgets'\s*=>\s*\[\s*'namespace'\s*=>\s*(.*),\s*'path'\s*=>\s*(.*),/", $config, $matches) ? $matches[1] : 'app_path(\'Filament/Widgets\')';
-$widgetsPathPhp = preg_match("/'widgets'\s*=>\s*\[\s*'namespace'\s*=>\s*(.*),\s*'path'\s*=>\s*(.*),/", $config, $matches) ? $matches[2] : '\'App\\\\Filament\\\\Widgets\'';
+$widgetsNamespacePhp = preg_match("/'widgets'\s*=>\s*\[\s*'namespace'\s*=>\s*(.*),\s*'path'\s*=>\s*(.*),/", $config, $matches) ? $matches[1] : '\'App\\\\Filament\\\\Widgets\'';
+$widgetsPathPhp = preg_match("/'widgets'\s*=>\s*\[\s*'namespace'\s*=>\s*(.*),\s*'path'\s*=>\s*(.*),/", $config, $matches) ? $matches[2] : 'app_path(\'Filament/Widgets\')';
 
 $databaseNotificationsPhp = preg_match("/'database_notifications'\s*=>\s*\[\s*'enabled'\s*=>\s*(.*),/", $config, $matches) ? $matches[1] : null;
 if ($databaseNotificationsPhp === 'false') {
@@ -44,6 +44,33 @@ if ($databaseNotificationsPollingIntervalPhp === '\'30s\'') {
 }
 $databaseNotificationsPollingIntervalPhp = $databaseNotificationsPollingIntervalPhp ? "\n            ->databaseNotificationsPollingInterval({$databaseNotificationsPollingIntervalPhp})" : '';
 
+$navigationGroupsPhp = null;
+
+$serviceProviders = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('app/Providers'), RecursiveIteratorIterator::SELF_FIRST);
+
+foreach ($serviceProviders as $serviceProvider) {
+    if ($serviceProvider->isDir()) {
+        continue;
+    }
+
+    $serviceProviderContents = file_get_contents($serviceProvider->getPathname());
+
+    if (! preg_match('/Filament::registerNavigationGroups\((\[[^\]]*\])\)/', $serviceProviderContents, $matches)) {
+        continue;
+    }
+
+    $navigationGroupsPhp = preg_replace('/\n\s*/', "\n                ", $matches[1]);
+    $navigationGroupsPhp = str_replace("\n                ]", "\n            ]", $navigationGroupsPhp);
+
+    $serviceProviderContents = preg_replace('/Filament::registerNavigationGroups\((\[[^\]]*\])\);/', '', $serviceProviderContents);
+
+    file_put_contents($serviceProvider->getPathname(), $serviceProviderContents);
+
+    break;
+}
+
+$navigationGroupsPhp = $navigationGroupsPhp ? "\n            ->navigationGroups({$navigationGroupsPhp})" : '';
+
 if (! file_exists('app/Providers/Filament')) {
     mkdir('app/Providers/Filament', 0777, true);
 }
@@ -56,6 +83,7 @@ use Filament\ContextProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
 use Filament\Support\Color;
 use Filament\Widgets;
@@ -86,7 +114,7 @@ class {$className} extends ContextProvider
             ->widgets([
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
-            ]){$databaseNotificationsPhp}{$databaseNotificationsPollingIntervalPhp}
+            ]){$navigationGroupsPhp}{$databaseNotificationsPhp}{$databaseNotificationsPollingIntervalPhp}
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
