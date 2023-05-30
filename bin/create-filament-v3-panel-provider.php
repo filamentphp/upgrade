@@ -8,7 +8,7 @@ $pathPhp = preg_match('/\'path\'\s*=>\s*(.*),/', $config, $matches) ? $matches[1
 $path = preg_match('/env\(\'FILAMENT_PATH\',\s*\'(.*)\'\)/', $pathPhp, $matches) ? $matches[1] : 'admin';
 
 $isAdmin = trim($path, '/') === 'admin';
-$className = $isAdmin ? 'AdminContextProvider' : 'AppContextProvider';
+$className = $isAdmin ? 'AdminPanelProvider' : 'AppPanelProvider';
 $id = $isAdmin ? 'admin' : 'app';
 
 $domainPhp = preg_match('/\'domain\'\s*=>\s*(.*),/', $config, $matches) ? $matches[1] : null;
@@ -51,13 +51,13 @@ file_put_contents("app/Providers/Filament/{$className}.php", "<?php
 
 namespace App\Providers\Filament;
 
-use Filament\Context;
-use Filament\ContextProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
+use Filament\Panel;
+use Filament\PanelProvider;
 use Filament\Support\Color;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -68,11 +68,11 @@ use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
-class {$className} extends ContextProvider
+class {$className} extends PanelProvider
 {
-    public function context(Context \$context): Context
+    public function panel(Panel \$panel): Panel
     {
-        return \$context
+        return \$panel
             ->default()
             ->id('{$id}')
             ->path({$pathPhp}){$domainPhp}
