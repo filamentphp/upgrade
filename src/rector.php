@@ -48,11 +48,13 @@ return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->ruleWithConfiguration(
         RenameMethodRector::class,
         [
+            new MethodCallRename('Filament\\Models\\Contracts\\FilamentUser', 'canAccessFilament', 'canAccessPanel'),
             new MethodCallRename('Filament\\Pages\\Page', 'getActions', 'getHeaderActions'),
             new MethodCallRename('Filament\\Tables\\Table', 'prependActions', 'actions'),
             new MethodCallRename('Filament\\Tables\\Table', 'pushActions', 'actions'),
-            new MethodCallRename('Filament\\Tables\\Table', 'prependBulkActions', 'bulkActions'),
-            new MethodCallRename('Filament\\Tables\\Table', 'pushBulkActions', 'bulkActions'),
+            new MethodCallRename('Filament\\Tables\\Table', 'bulkActions', 'groupedBulkActions'),
+            new MethodCallRename('Filament\\Tables\\Table', 'prependBulkActions', 'groupedBulkActions'),
+            new MethodCallRename('Filament\\Tables\\Table', 'pushBulkActions', 'groupedBulkActions'),
         ],
     );
 
