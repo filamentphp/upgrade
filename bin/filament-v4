@@ -84,6 +84,13 @@ foreach (json_decode(file_get_contents('composer.json'), true)['require'] as $pa
         continue;
     }
 
+    if ($package === 'filament/spatie-laravel-translatable-plugin') {
+        $requireCommands[] = "composer remove filament/spatie-laravel-translatable-plugin -W --no-update";
+        $requireCommands[] = "composer require lara-zeus/spatie-translatable -W --no-update";
+
+        continue;
+    }
+
     $requireCommands[] = "composer require {$package}:\"^4.0\" -W --no-update";
 }
 

@@ -238,6 +238,14 @@ return static function (RectorConfig $rectorConfig): void {
             'Filament\\Tables\\Columns\\TextColumn\\TextColumnSize' => 'Filament\\Support\\Enums\\TextSize',
             'Filament\\Support\\View\\Components\\Modal' => 'Filament\\Support\\View\\Components\\ModalComponent',
             'Filament\\Support\\Enums\\ActionSize' => 'Filament\\Support\\Enums\\Size',
+            'Filament\\SpatieLaravelTranslatablePlugin' => 'LaraZeus\\SpatieTranslatablePlugin',
+            'Filament\\Resources\\Concerns\\Translatable' => 'LaraZeus\\SpatieTranslatable\\Resources\\Concerns\\Translatable',
+            'Filament\\Resources\\Pages\\ListRecords\\Concerns\\Translatable' => 'LaraZeus\\SpatieTranslatable\\Resources\\Pages\\ListRecords\\Concerns\\Translatable',
+            'Filament\\Resources\\Pages\\CreateRecord\\Concerns\\Translatable' => 'LaraZeus\\SpatieTranslatable\\Resources\\Pages\\ListRecords\\Concerns\\Translatable',
+            'Filament\\Resources\\Pages\\EditRecord\\Concerns\\Translatable' => 'LaraZeus\\SpatieTranslatable\\Resources\\Pages\\ListRecords\\Concerns\\Translatable',
+            'Filament\\Resources\\Pages\\ViewRecord\\Concerns\\Translatable' => 'LaraZeus\\SpatieTranslatable\\Resources\\Pages\\ListRecords\\Concerns\\Translatable',
+            'Filament\\Resources\\Pages\\ManageRecords\\Concerns\\Translatable' => 'LaraZeus\\SpatieTranslatable\\Resources\\Pages\\ListRecords\\Concerns\\Translatable',
+            'Filament\\Tables\\Actions\\LocaleSwitcher' => 'LaraZeus\\SpatieTranslatable\\Tables\\Actions\\LocaleSwitcher',
         ],
     );
 

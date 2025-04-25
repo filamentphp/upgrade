@@ -7,6 +7,7 @@ use Filament\Pages\Dashboard;
 use Filament\Pages\Page;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Resources\Resource;
 use Filament\Support\Contracts\HasColor;
 use Filament\Tables\Contracts\HasTable;
 use Illuminate\Validation\Rules\Enum;
@@ -35,6 +36,17 @@ class SimpleMethodChangesRector extends AbstractRector
     public function getChanges(): array
     {
         return [
+            [
+                'class' => [
+                    Page::class,
+                    Resource::class,
+                ],
+                'changes' => [
+                    'getNavigationBadgeColor' => function (ClassMethod $node): void {
+                        $node->returnType = new Identifier('?string');
+                    },
+                ],
+            ],
             [
                 'class' => [
                     Page::class,
