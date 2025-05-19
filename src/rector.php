@@ -66,6 +66,8 @@ return static function (RectorConfig $rectorConfig): void {
             'Filament\\Forms\\Concerns\\HasOperation' => 'Filament\\Schemas\\Concerns\\HasOperation',
             'Filament\\Forms\\Concerns\\HasState' => 'Filament\\Schemas\\Concerns\\HasState',
             'Filament\\Forms\\Concerns\\HasColumns' => 'Filament\\Schemas\\Concerns\\HasColumns',
+            'Filament\\Forms\\Concerns\\HasName' => 'Filament\\Schemas\\Concerns\\HasName',
+            'Filament\\Infolists\\Concerns\\HasName' => 'Filament\\Schemas\\Concerns\\HasName',
             'Filament\\Infolists\\Concerns\\HasColumns' => 'Filament\\Schemas\\Concerns\\HasColumns',
             'Filament\\Infolists\\Infolist' => 'Filament\\Schemas\\Schema',
             'Filament\\Forms\\Concerns\\HasStateBindingModifiers' => 'Filament\\Schemas\\Concerns\\HasStateBindingModifiers',
