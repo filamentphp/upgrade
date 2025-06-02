@@ -5,6 +5,7 @@ use Filament\Facades\Filament;
 use Filament\FilamentManager;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Schema;
+use Filament\Support\Colors\Color;
 use Filament\Tables\Filters\BaseFilter;
 use Filament\Upgrade\Rector;
 use Filament\Widgets\Widget;
@@ -302,5 +303,7 @@ return static function (RectorConfig $rectorConfig): void {
         new MethodCallRename(Schema::class, 'schema', 'components'),
         new MethodCallRename(FilamentManager::class, 'getCurrentPanel', 'getCurrentOrDefaultPanel'),
         new MethodCallRename(Filament::class, 'getCurrentPanel', 'getCurrentOrDefaultPanel'),
+        new MethodCallRename(Color::class, 'hex', 'generateV3Palette'),
+        new MethodCallRename(Color::class, 'rgb', 'generateV3Palette'),
     ]);
 };
