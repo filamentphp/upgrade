@@ -7,6 +7,7 @@ use Filament\Schemas\Components\Component;
 use Filament\Schemas\Schema;
 use Filament\Support\Colors\Color;
 use Filament\Tables\Filters\BaseFilter;
+use Filament\Tables\Table;
 use Filament\Upgrade\Rector;
 use Filament\Widgets\Widget;
 use Rector\Config\RectorConfig;
@@ -18,6 +19,9 @@ use Rector\Renaming\ValueObject\MethodCallRename;
 use Rector\Renaming\ValueObject\RenameProperty;
 
 return static function (RectorConfig $rectorConfig): void {
+    $rectorConfig->importNames();
+    $rectorConfig->importShortClasses();
+
     $rectorConfig->ruleWithConfiguration(
         RenameClassRector::class,
         [
@@ -78,7 +82,6 @@ return static function (RectorConfig $rectorConfig): void {
             'Filament\\Forms\\Components\\Component' => 'Filament\\Schemas\\Components\\Component',
             'Filament\\Forms\\Components\\Concerns\\BelongsToContainer' => 'Filament\\Schemas\\Components\\Concerns\\BelongsToContainer',
             'Filament\\Forms\\Components\\Concerns\\BelongsToModel' => 'Filament\\Schemas\\Components\\Concerns\\BelongsToModel',
-            'Filament\\Forms\\Components\\Concerns\\CanBeConcealed' => 'Filament\\Schemas\\Components\\Concerns\\CanBeConcealed',
             'Filament\\Forms\\Components\\Concerns\\CanBeDisabled' => 'Filament\\Schemas\\Components\\Concerns\\CanBeDisabled',
             'Filament\\Forms\\Components\\Concerns\\CanBeHidden' => 'Filament\\Schemas\\Components\\Concerns\\CanBeHidden',
             'Filament\\Forms\\Components\\Concerns\\CanBeRepeated' => 'Filament\\Schemas\\Components\\Concerns\\CanBeRepeated',
@@ -99,7 +102,6 @@ return static function (RectorConfig $rectorConfig): void {
             'Filament\\Forms\\Components\\Actions\\Action' => 'Filament\\Actions\\Action',
             'Filament\\Forms\\Components\\Tabs' => 'Filament\\Schemas\\Components\\Tabs',
             'Filament\\Forms\\Components\\Tabs\\Tab' => 'Filament\\Schemas\\Components\\Tabs\\Tab',
-            'Filament\\Forms\\Components\\Contracts\\CanConcealComponents' => 'Filament\\Schemas\\Components\\Contracts\\CanConcealComponents',
             'Filament\\Forms\\Components\\Wizard' => 'Filament\\Schemas\\Components\\Wizard',
             'Filament\\Forms\\Components\\Wizard\\Step' => 'Filament\\Schemas\\Components\\Wizard\\Step',
             'Filament\\Forms\\Components\\Fieldset' => 'Filament\\Schemas\\Components\\Fieldset',
@@ -241,14 +243,16 @@ return static function (RectorConfig $rectorConfig): void {
             'Filament\\Tables\\Columns\\TextColumn\\TextColumnSize' => 'Filament\\Support\\Enums\\TextSize',
             'Filament\\Support\\View\\Components\\Modal' => 'Filament\\Support\\View\\Components\\ModalComponent',
             'Filament\\Support\\Enums\\ActionSize' => 'Filament\\Support\\Enums\\Size',
-            'Filament\\SpatieLaravelTranslatablePlugin' => 'LaraZeus\\SpatieTranslatablePlugin',
+            'Filament\\SpatieLaravelTranslatablePlugin' => 'LaraZeus\\SpatieTranslatable\\SpatieTranslatablePlugin',
             'Filament\\Resources\\Concerns\\Translatable' => 'LaraZeus\\SpatieTranslatable\\Resources\\Concerns\\Translatable',
             'Filament\\Resources\\Pages\\ListRecords\\Concerns\\Translatable' => 'LaraZeus\\SpatieTranslatable\\Resources\\Pages\\ListRecords\\Concerns\\Translatable',
-            'Filament\\Resources\\Pages\\CreateRecord\\Concerns\\Translatable' => 'LaraZeus\\SpatieTranslatable\\Resources\\Pages\\ListRecords\\Concerns\\Translatable',
-            'Filament\\Resources\\Pages\\EditRecord\\Concerns\\Translatable' => 'LaraZeus\\SpatieTranslatable\\Resources\\Pages\\ListRecords\\Concerns\\Translatable',
-            'Filament\\Resources\\Pages\\ViewRecord\\Concerns\\Translatable' => 'LaraZeus\\SpatieTranslatable\\Resources\\Pages\\ListRecords\\Concerns\\Translatable',
-            'Filament\\Resources\\Pages\\ManageRecords\\Concerns\\Translatable' => 'LaraZeus\\SpatieTranslatable\\Resources\\Pages\\ListRecords\\Concerns\\Translatable',
-            'Filament\\Tables\\Actions\\LocaleSwitcher' => 'LaraZeus\\SpatieTranslatable\\Tables\\Actions\\LocaleSwitcher',
+            'Filament\\Resources\\Pages\\CreateRecord\\Concerns\\Translatable' => 'LaraZeus\\SpatieTranslatable\\Resources\\Pages\\CreateRecord\\Concerns\\Translatable',
+            'Filament\\Resources\\Pages\\EditRecord\\Concerns\\Translatable' => 'LaraZeus\\SpatieTranslatable\\Resources\\Pages\\EditRecord\\Concerns\\Translatable',
+            'Filament\\Resources\\Pages\\ViewRecord\\Concerns\\Translatable' => 'LaraZeus\\SpatieTranslatable\\Resources\\Pages\\ViewRecord\\Concerns\\Translatable',
+            'Filament\\Resources\\Pages\\ManageRecords\\Concerns\\Translatable' => 'LaraZeus\\SpatieTranslatable\\Resources\\Pages\\ManageRecords\\Concerns\\Translatable',
+            'Filament\\Actions\\LocaleSwitcher' => 'LaraZeus\\SpatieTranslatable\\Actions\\LocaleSwitcher',
+            'Filament\\Tables\\Actions\\LocaleSwitcher' => 'LaraZeus\\SpatieTranslatable\\Actions\\LocaleSwitcher',
+            'Filament\\Tables\\Enums\\ActionsPosition' => 'Filament\\Tables\\Enums\\RecordActionsPosition',
         ],
     );
 
@@ -286,6 +290,8 @@ return static function (RectorConfig $rectorConfig): void {
     );
 
     $rectorConfig->rules([
+        Rector\AddPanelParamToRouteMethodsRector::class,
+        Rector\ReplaceStringPanelParamWithPanelParamRector::class,
         Rector\SimpleMethodChangesRector::class,
         Rector\SimplePropertyChangesRector::class,
         Rector\RenameSchemaParamToMatchTypeRector::class,
@@ -305,5 +311,12 @@ return static function (RectorConfig $rectorConfig): void {
         new MethodCallRename(Filament::class, 'getCurrentPanel', 'getCurrentOrDefaultPanel'),
         new MethodCallRename(Color::class, 'hex', 'generateV3Palette'),
         new MethodCallRename(Color::class, 'rgb', 'generateV3Palette'),
+        new MethodCallRename(Table::class, 'actions', 'recordActions'),
+        new MethodCallRename(Table::class, 'pushActions', 'pushRecordActions'),
+        new MethodCallRename(Table::class, 'actionsColumnLabel', 'recordActionsColumnLabel'),
+        new MethodCallRename(Table::class, 'actionsAlignment', 'recordActionsAlignment'),
+        new MethodCallRename(Table::class, 'actionsPosition', 'recordActionsPosition'),
+        new MethodCallRename(Table::class, 'bulkActions', 'toolbarActions'),
+        new MethodCallRename(Table::class, 'pushBulkActions', 'pushToolbarActions'),
     ]);
 };

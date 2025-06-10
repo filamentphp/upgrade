@@ -5,8 +5,11 @@ namespace Filament\Upgrade\Rector;
 use Closure;
 use Filament\Pages\Dashboard;
 use Filament\Pages\Page;
+use Filament\Pages\Tenancy\EditTenantProfile;
+use Filament\Pages\Tenancy\RegisterTenant;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Resources\Resource;
 use Filament\Tables\Contracts\HasTable;
 use PhpParser\Modifiers;
 use PhpParser\Node;
@@ -32,10 +35,40 @@ class SimpleMethodChangesRector extends AbstractRector
      */
     public function getChanges(): array
     {
+        $prependPanelParamModifier = static function (ClassMethod $node): void {
+            $panelParam = new Param(new Variable('panel'), type: new FullyQualified('Filament\\Panel'));
+
+            foreach ($node->getParams() as $param) {
+                if ($param->var->name === 'panel') {
+                    return;
+                }
+            }
+
+            array_unshift($node->params, $panelParam);
+        };
+
+        $prependNullablePanelParamModifier = static function (ClassMethod $node): void {
+            $panelParam = new Param(
+                var: new Variable('panel'),
+                type: new Node\NullableType(new FullyQualified('Filament\\Panel')),
+                default: new Node\Expr\ConstFetch(new Node\Name('null'))
+            );
+
+            foreach ($node->getParams() as $param) {
+                if ($param->var->name === 'panel') {
+                    return;
+                }
+            }
+
+            array_unshift($node->params, $panelParam);
+        };
+
         return [
             [
                 'class' => [
                     Page::class,
+                    EditTenantProfile::class,
+                    RegisterTenant::class,
                 ],
                 'changes' => [
                     'getFooterWidgetsColumns' => function (ClassMethod $node): void {
@@ -47,6 +80,21 @@ class SimpleMethodChangesRector extends AbstractRector
                     'getSubNavigationPosition' => function (ClassMethod $node): void {
                         $node->flags &= Modifiers::STATIC;
                     },
+                    'getRoutePath' => $prependPanelParamModifier,
+                    'getRelativeRouteName' => $prependPanelParamModifier,
+                    'getSlug' => $prependNullablePanelParamModifier,
+                    'prependClusterSlug' => $prependPanelParamModifier,
+                    'prependClusterRouteBaseName' => $prependPanelParamModifier,
+                ],
+            ],
+            [
+                'class' => [
+                    Resource::class,
+                ],
+                'changes' => [
+                    'getRelativeRouteName' => $prependPanelParamModifier,
+                    'getRoutePrefix' => $prependPanelParamModifier,
+                    'getSlug' => $prependNullablePanelParamModifier,
                 ],
             ],
             [
