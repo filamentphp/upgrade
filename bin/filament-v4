@@ -91,7 +91,13 @@ foreach (json_decode(file_get_contents('composer.json'), true)['require'] as $pa
         continue;
     }
 
-    $requireCommands[] = "composer require {$package}:\"^4.0\" -W --no-update";
+    $isWindowsPowershell = str_starts_with(php_uname(), 'Windows');
+
+    if (! $isWindowsPowershell) {
+        $requireCommands[] = "composer require {$package}:\"^4.0\" -W --no-update";
+    } else {
+        $requireCommands[] = "composer require '\"{$package}:^4.0\"' -W --no-update";
+    }
 }
 
 $requireCommands = implode("</strong><br /><strong>", $requireCommands);
