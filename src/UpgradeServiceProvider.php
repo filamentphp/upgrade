@@ -3,7 +3,6 @@
 namespace Filament\Upgrade;
 
 use Filament\Upgrade\Commands\UpgradeDirectoryStructureToV4Command;
-use Filament\Upgrade\Commands\UpgradeTailwindToV4Command;
 use Illuminate\Support\ServiceProvider;
 
 class UpgradeServiceProvider extends ServiceProvider
@@ -12,7 +11,6 @@ class UpgradeServiceProvider extends ServiceProvider
     {
         $this->commands([
             UpgradeDirectoryStructureToV4Command::class,
-            UpgradeTailwindToV4Command::class,
         ]);
     }
 }
